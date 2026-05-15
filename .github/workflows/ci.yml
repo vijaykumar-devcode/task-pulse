@@ -75,3 +75,10 @@ jobs:
           name: openapi-spec
           path: openapi.json
           if-no-files-found: error
+
+      - name: Upload Postman collection
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-collection
+          path: task-pulse.postman_collection.json
+          if-no-files-found: error
