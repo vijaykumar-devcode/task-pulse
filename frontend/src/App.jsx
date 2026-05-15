@@ -154,7 +154,7 @@ const TaskFormPage = () => {
   const { id } = useParams();
   const { user } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
-  const [task, setTask] = useState({ title: '', description: '', status: 'todo', priority: 'medium', dueDate: '', assignedTo: '', documents: [] });
+  const [task, setTask] = useState({ title: '', description: '', status: 'todo', priority: 'medium', dueDate: '', assignedTo: '', assignedToInput: '', documents: [] });
   const [existingDocuments, setExistingDocuments] = useState([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -180,6 +180,7 @@ const TaskFormPage = () => {
         priority: current.priority || 'medium',
         dueDate: current.dueDate ? new Date(current.dueDate).toISOString().slice(0, 10) : '',
         assignedTo: current.assignedTo?.id || '',
+        assignedToInput: current.assignedTo?.email || '',
         documents: [],
       });
       setExistingDocuments(current.documents || []);
@@ -197,10 +198,27 @@ const TaskFormPage = () => {
       return;
     }
 
+    const assignedToValue = task.assignedToInput.trim();
+    let assignedTo = task.assignedTo;
+
+    if (assignedToValue) {
+      const matchedUser = users.find((item) => item.id === assignedToValue || item.email.toLowerCase() === assignedToValue.toLowerCase());
+      if (!matchedUser) {
+        setError('Enter a valid user email for Assign to.');
+        return;
+      }
+      assignedTo = matchedUser.id;
+    } else {
+      assignedTo = '';
+    }
+
     const formData = new FormData();
-    Object.entries(task).forEach(([key, value]) => {
+    Object.entries({ ...task, assignedTo }).forEach(([key, value]) => {
       if (key === 'documents') {
         value.forEach((file) => formData.append('documents', file));
+        return;
+      }
+      if (key === 'assignedToInput') {
         return;
       }
       if (value !== '') {
@@ -232,10 +250,14 @@ const TaskFormPage = () => {
             <Grid item xs={12} md={4}><TextField select label="Priority" value={task.priority} onChange={(event) => setTask({ ...task, priority: event.target.value })} fullWidth><MenuItem value="low">Low</MenuItem><MenuItem value="medium">Medium</MenuItem><MenuItem value="high">High</MenuItem></TextField></Grid>
             <Grid item xs={12} md={4}><TextField label="Due date" type="date" value={task.dueDate} onChange={(event) => setTask({ ...task, dueDate: event.target.value })} fullWidth InputLabelProps={{ shrink: true }} /></Grid>
           </Grid>
-          <TextField select label="Assign to" value={task.assignedTo} onChange={(event) => setTask({ ...task, assignedTo: event.target.value })} fullWidth>
-            <MenuItem value="">Unassigned</MenuItem>
-            {users.map((item) => <MenuItem key={item.id} value={item.id}>{item.email}</MenuItem>)}
-          </TextField>
+          <TextField
+            label="Assign to"
+            value={task.assignedToInput}
+            onChange={(event) => setTask({ ...task, assignedToInput: event.target.value })}
+            fullWidth
+            placeholder="Type a user email"
+            helperText="Type the assignee's email or leave blank to keep it unassigned."
+          />
           <Button variant="outlined" component="label">
             Attach PDF documents
             <input hidden type="file" accept="application/pdf" multiple onChange={(event) => setTask({ ...task, documents: Array.from(event.target.files || []) })} />

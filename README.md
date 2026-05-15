@@ -59,6 +59,7 @@ docker compose up --build
 ```
 
 Then open:
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:5000
 - Swagger UI: http://localhost:5000/api-docs
@@ -74,30 +75,30 @@ npm test --workspace backend
 Troubleshooting tests and `mongodb-memory-server`:
 
 - If tests hang while mongodb-memory-server downloads a MongoDB binary, you can either:
-	- Disable the automatic postinstall binary download when installing and let tests download at runtime:
+  - Disable the automatic postinstall binary download when installing and let tests download at runtime:
 
-		```powershell
-		$env:MONGOMS_DISABLE_POSTINSTALL=1
-		npm install
-		npm install --workspace backend
-		npm install --workspace frontend
-		npm test --workspace backend
-		```
+    ```powershell
+    $env:MONGOMS_DISABLE_POSTINSTALL=1
+    npm install
+    npm install --workspace backend
+    npm install --workspace frontend
+    npm test --workspace backend
+    ```
 
-	- Or run a local Docker MongoDB and point tests to it by setting `TEST_MONGO_URI` before running tests:
+  - Or run a local Docker MongoDB and point tests to it by setting `TEST_MONGO_URI` before running tests:
 
-		```powershell
-		docker compose up -d mongo
-		$env:TEST_MONGO_URI='mongodb://localhost:27017/fsd_test'
-		npm test --workspace backend
-		```
+    ```powershell
+    docker compose up -d mongo
+    $env:TEST_MONGO_URI='mongodb://localhost:27017/fsd_test'
+    npm test --workspace backend
+    ```
 
-	- If you see lockfile errors for the binary cache, remove the binary cache and retry (Windows example):
+  - If you see lockfile errors for the binary cache, remove the binary cache and retry (Windows example):
 
-		```powershell
-		Remove-Item -Recurse -Force $env:USERPROFILE\\.cache\\mongodb-binaries\\*
-		npm test --workspace backend
-		```
+    ```powershell
+    Remove-Item -Recurse -Force $env:USERPROFILE\\.cache\\mongodb-binaries\\*
+    npm test --workspace backend
+    ```
 
 ## API Overview
 
@@ -152,10 +153,9 @@ git push -u origin main
 ```
 
 - Exporting API docs / OpenAPI (two options):
+  1.  Start the backend server and use the Swagger UI at `http://localhost:5000/api-docs` to export the OpenAPI JSON/ YAML and import into Postman.
 
-	1. Start the backend server and use the Swagger UI at `http://localhost:5000/api-docs` to export the OpenAPI JSON/ YAML and import into Postman.
-
-	2. Generate the OpenAPI JSON from the project (when `backend/src/config/swagger.js` exports the spec):
+  2.  Generate the OpenAPI JSON from the project (when `backend/src/config/swagger.js` exports the spec):
 
 ```bash
 # from the repo root
@@ -174,7 +174,7 @@ docker compose up --build
 ```
 
 - CI suggestion (GitHub Actions):
-	- Steps: checkout, setup Node, install dependencies, run `npm test --workspace backend`, build frontend, build docker images (optional), and publish to a registry.
+  - Steps: checkout, setup Node, install dependencies, run `npm test --workspace backend`, build frontend, build docker images (optional), and publish to a registry.
 
 ## Next Steps I Can Do
 
