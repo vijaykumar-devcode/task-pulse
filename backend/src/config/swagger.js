@@ -1,0 +1,161 @@
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'FSD Task Manager API',
+      version: '1.0.0',
+      description: 'JWT authenticated task management API with user CRUD, task CRUD, PDF attachments, filtering, sorting, and pagination.',
+    },
+    servers: [{ url: 'http://localhost:5000/api' }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+      schemas: {
+        AuthRequest: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string', format: 'email' },
+            password: { type: 'string', minLength: 6 },
+            role: { type: 'string', enum: ['user', 'admin'] },
+          },
+        },
+        User: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Document: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            filename: { type: 'string' },
+            originalName: { type: 'string' },
+            mimetype: { type: 'string' },
+            size: { type: 'number' },
+            uploadedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Task: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            status: { type: 'string', enum: ['todo', 'in_progress', 'done'] },
+            priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+            dueDate: { type: 'string', format: 'date-time', nullable: true },
+            createdBy: { $ref: '#/components/schemas/User' },
+            assignedTo: { $ref: '#/components/schemas/User' },
+            documents: { type: 'array', items: { $ref: '#/components/schemas/Document' } },
+          },
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
+    paths: {
+      '/auth/register': {
+        post: {
+          summary: 'Register a user',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthRequest' } } },
+          },
+          responses: { 201: { description: 'Created' }, 409: { description: 'User already exists' } },
+        },
+      },
+      '/auth/login': {
+        post: {
+          summary: 'Login and receive a JWT',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthRequest' } } },
+          },
+          responses: { 200: { description: 'Authenticated' }, 401: { description: 'Invalid credentials' } },
+        },
+      },
+      '/auth/me': {
+        get: {
+          summary: 'Get current user',
+          tags: ['Auth'],
+          responses: { 200: { description: 'Current user' } },
+        },
+      },
+      '/users': {
+        get: {
+          summary: 'List users',
+          tags: ['Users'],
+          parameters: [
+            { in: 'query', name: 'page', schema: { type: 'integer' } },
+            { in: 'query', name: 'limit', schema: { type: 'integer' } },
+            { in: 'query', name: 'search', schema: { type: 'string' } },
+            { in: 'query', name: 'role', schema: { type: 'string' } },
+          ],
+          responses: { 200: { description: 'Users page' } },
+        },
+        post: {
+          summary: 'Create a user',
+          tags: ['Users'],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthRequest' } } },
+          },
+          responses: { 201: { description: 'Created' } },
+        },
+      },
+      '/users/{id}': {
+        get: { summary: 'Get a user', tags: ['Users'], responses: { 200: { description: 'User' } } },
+        put: { summary: 'Update a user', tags: ['Users'], responses: { 200: { description: 'Updated' } } },
+        patch: { summary: 'Patch a user', tags: ['Users'], responses: { 200: { description: 'Updated' } } },
+        delete: { summary: 'Delete a user', tags: ['Users'], responses: { 204: { description: 'Deleted' } } },
+      },
+      '/tasks': {
+        get: {
+          summary: 'List tasks',
+          tags: ['Tasks'],
+          parameters: [
+            { in: 'query', name: 'page', schema: { type: 'integer' } },
+            { in: 'query', name: 'limit', schema: { type: 'integer' } },
+            { in: 'query', name: 'status', schema: { type: 'string' } },
+            { in: 'query', name: 'priority', schema: { type: 'string' } },
+            { in: 'query', name: 'search', schema: { type: 'string' } },
+          ],
+          responses: { 200: { description: 'Tasks page' } },
+        },
+        post: {
+          summary: 'Create a task',
+          tags: ['Tasks'],
+          requestBody: { required: true },
+          responses: { 201: { description: 'Created' } },
+        },
+      },
+      '/tasks/{id}': {
+        get: { summary: 'Get a task', tags: ['Tasks'], responses: { 200: { description: 'Task' } } },
+        put: { summary: 'Update a task', tags: ['Tasks'], responses: { 200: { description: 'Updated' } } },
+        patch: { summary: 'Patch a task', tags: ['Tasks'], responses: { 200: { description: 'Updated' } } },
+        delete: { summary: 'Delete a task', tags: ['Tasks'], responses: { 204: { description: 'Deleted' } } },
+      },
+      '/tasks/{id}/documents/{documentId}': {
+        get: { summary: 'View or download a task document', tags: ['Tasks'], responses: { 200: { description: 'PDF document' } } },
+        delete: { summary: 'Delete a task document', tags: ['Tasks'], responses: { 204: { description: 'Deleted' } } },
+      },
+    },
+  },
+  apis: [],
+});
+
+module.exports = swaggerSpec;
