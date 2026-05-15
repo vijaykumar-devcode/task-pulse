@@ -176,7 +176,3 @@ docker compose up --build
 - CI suggestion (GitHub Actions):
   - Steps: checkout, setup Node, install dependencies, run `npm test --workspace backend`, build frontend, build docker images (optional), and publish to a registry.
 
-## Roadmap
-
-This repository is intended to stay focused on implementation, setup, and delivery details. Planned changes should be tracked in GitHub issues or a separate project board rather than in the README.
-
