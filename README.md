@@ -176,10 +176,7 @@ docker compose up --build
 - CI suggestion (GitHub Actions):
   - Steps: checkout, setup Node, install dependencies, run `npm test --workspace backend`, build frontend, build docker images (optional), and publish to a registry.
 
-## Next Steps I Can Do
+## Roadmap
 
-- Initialize the git repo here and make the first commit.
-- Generate `openapi.json` from the backend and produce a Postman collection.
-- Add a sample GitHub Actions workflow to `.github/workflows/ci.yml`.
+This repository is intended to stay focused on implementation, setup, and delivery details. Planned changes should be tracked in GitHub issues or a separate project board rather than in the README.
 
-Tell me which of the above you want me to run now and I will proceed.
