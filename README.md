@@ -1,6 +1,6 @@
 # Task Pulse
 
-Task Pulse is a full-stack task management system built for the FSD intern assignment. It uses React + Vite on the frontend, Express + MongoDB on the backend, JWT authentication, PDF task attachments, Swagger API docs, Docker, and automated tests.
+Task Pulse is a full-stack task management system built . It uses React + Vite on the frontend, Express + MongoDB on the backend, JWT authentication, PDF task attachments, Swagger API docs, Docker, and automated tests.
 
 ## Features
 
